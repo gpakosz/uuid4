@@ -1,0 +1,11 @@
+/build
+/ipch
+/.vs
+
+*.suo
+*.sdf
+*.opensdf
+*.user
+*.sln.docstates
+*.opendb
+*.db
