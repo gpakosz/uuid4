@@ -119,6 +119,47 @@ void UUID4_PREFIX(seed)(uint64_t* state)
   *state = *state * 6364136223846793005u + (uintptr_t)UUID4_PREFIX(gen);
 }
 
+#elif defined(ESP_PLATFORM)
+
+#if !defined(UUID4_CLOCK_ID)
+  #define UUID4_CLOCK_ID CLOCK_MONOTONIC
+#endif
+
+#include <time.h>
+#include <unistd.h>
+#include "esp_system.h"
+
+UUID4_FUNCSPEC
+void UUID4_PREFIX(seed)(uint64_t* state)
+{
+  static uint64_t state0 = 0;
+
+  struct timespec time;
+  //bool ok = clock_gettime(UUID4_CLOCK_ID, &time) == 0;
+  //UUID4_ASSERT(ok);
+  uint8_t mac[6];
+  esp_read_mac (mac, 0);
+
+  uint64_t initial = 0;
+  initial = (initial << 8) + (uint64_t)mac[3];
+  initial = (initial << 8) + (uint64_t)mac[1];
+  initial = (initial << 8) + (uint64_t)mac[2];
+  initial = (initial << 8) + (uint64_t)mac[0];
+  initial = (initial << 8) + (uint64_t)mac[4];
+  initial = (initial << 8) + (uint64_t)mac[5];
+  initial = (initial << 8) + (uint64_t)mac[2];
+  initial = (initial << 8) + (uint64_t)mac[4];
+
+  //*state = state0++ + ((uintptr_t)&time ^ (uint64_t)(time.tv_sec * 1000000000 + time.tv_nsec));
+  *state = state0++ + ((uintptr_t)&time ^ initial);
+
+  uint32_t pid = (uint32_t)esp_random();
+  uint32_t tid = (uint32_t)esp_random();
+  *state = *state * 6364136223846793005u + ((uint64_t)(UUID4_PREFIX(mix)(UUID4_PREFIX(hash)(pid), UUID4_PREFIX(hash)(tid))) << 32);
+  *state = *state * 6364136223846793005u + (uintptr_t)getpid;
+  *state = *state * 6364136223846793005u + (uintptr_t)UUID4_PREFIX(gen);
+}
+
 #elif defined(__APPLE__)
 
 #include <mach/mach_time.h>
