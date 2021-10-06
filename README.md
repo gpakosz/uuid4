@@ -6,6 +6,12 @@ A drop-in two files library to generate version 4 UUIDs.
 trivially predictable. But if you're willing to generate secure "tokens", that's
 not what UUIDs are made for anyway 🤷‍♂️
 
+The statistical properties of the generated UUIDs have been tested with
+[PractRand] and [TestU01] 🎲
+
+This implementation has been used in production for years without any reported
+defect so far 🤞
+
 Supported platforms:
 
 - Windows
@@ -18,6 +24,8 @@ Just drop `uuid4.h` and `uuid4.c` into your build and get started. (see also
 [customizing compilation])
 
 [customizing compilation]: #customizing-compilation
+[PractRand]: http://pracrand.sourceforge.net/PractRand.txt
+[TestU01]: http://simul.iro.umontreal.ca/testu01/tu01.html
 
 --------------------------------------------------------------------------------
 
